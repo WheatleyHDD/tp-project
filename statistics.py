@@ -13,12 +13,27 @@ import pdfkit
 
 
 class Vacancy:
+    """Класс для представления вакансии
+
+    Attributes:
+        name (str): Название вакансии
+        salary_from (int): Нижний порог зарплаты
+        salary_to (int): Верхний порог зарплаты
+        salary_currency (str): Валюта зарплаты
+        salary_average (int): Средняя зарплата
+        area_name (str): Город
+        year (int): Год публикации
+    """
     currency_to_rub = {
         "AZN": 35.68, "BYR": 23.91, "EUR": 59.90, "GEL": 21.74, "KGS": 0.76,
         "KZT": 0.13, "RUR": 1, "UAH": 1.64, "USD": 60.66, "UZS": 0.0055,
     }
 
     def __init__(self, vacancy):
+        """Конструктор объекта вакансий
+
+        :param dict vacancy: Словарь вакансии
+        """
         self.name = vacancy['name']
         self.salary_from = int(float(vacancy['salary_from']))
         self.salary_to = int(float(vacancy['salary_to']))
@@ -29,7 +44,19 @@ class Vacancy:
 
 
 class Statistic:
+    """Класс для представления статистики
+
+    Attributes:
+        salary (dict): Зарплата по годам
+        vacancies_number (dict): Количество вакансий по названиям
+        salary_of_vacancy_name (dict): Зарплата по вакансиям
+        vac_count_of_vacancy_name (dict): Количество вакансий по названию
+        salary_city (dict): Вакансии по городам
+        vac_city_number (dict): Количество вакансий по городам
+        count_of_vacancies (int): Количество вакансий
+    """
     def __init__(self):
+        """Конструктор класса статистики"""
         self.salary = {}
         self.vacancies_number = {}
         self.salary_of_vacancy_name = {}
@@ -39,16 +66,29 @@ class Statistic:
         self.count_of_vacancies = 0
 
     def year_sal_dynamics(self, vacancy):
+        """Составление динамики зарплаты по годам
+
+        :param Vacancy vacancy: Вакансия
+        """
         if vacancy.year not in self.salary:
             self.salary[vacancy.year] = [vacancy.salary_average]
         else: self.salary[vacancy.year].append(vacancy.salary_average)
 
     def year_vac_dynamics(self, vacancy):
+        """Составление динамики вакансий по годам
+
+        :param Vacancy vacancy: Вакансия
+        """
         if vacancy.year not in self.vacancies_number:
             self.vacancies_number[vacancy.year] = 1
         else: self.vacancies_number[vacancy.year] += 1
 
     def curr_vac_dynamics(self, vacancy, vacancy_name):
+        """Составление динамики зарплаты по конкретной вакансии по городам
+
+        :param Vacancy vacancy: Вакансия
+        :param str vacancy_name: Название вакансии
+        """
         if vacancy.name.find(vacancy_name) != -1:
             if vacancy.year not in self.salary_of_vacancy_name:
                 self.salary_of_vacancy_name[vacancy.year] = [vacancy.salary_average]
@@ -59,16 +99,29 @@ class Statistic:
             else: self.vac_count_of_vacancy_name[vacancy.year] += 1
 
     def city_sal_dynamics(self, vacancy):
+        """Составление динамики зарплаты по городам
+
+        :param Vacancy vacancy: Вакансия
+        """
         if vacancy.area_name not in self.salary_city:
             self.salary_city[vacancy.area_name] = [vacancy.salary_average]
         else: self.salary_city[vacancy.area_name].append(vacancy.salary_average)
 
     def city_count_dynamics(self, vacancy):
+        """Составление динамики количества вакансий по городам
+
+        :param Vacancy vacancy: Вакансия
+        """
         if vacancy.area_name not in self.vac_city_number:
             self.vac_city_number[vacancy.area_name] = 1
         else: self.vac_city_number[vacancy.area_name] += 1
 
     def write(self, vacancy, vacancy_name):
+        """Заполение статистики
+
+        :param Vacancy vacancy: Вакансия
+        :param str vacancy_name: Название определенной вакансии
+        """
         self.year_sal_dynamics(vacancy)
         self.year_vac_dynamics(vacancy)
         self.curr_vac_dynamics(vacancy, vacancy_name)
@@ -77,15 +130,27 @@ class Statistic:
         self.count_of_vacancies += 1
 
     def get_stat1(self):
+        """ Получить динамику уровня зарплат по годам
+
+        :return dict: Динамика уровня зарплат по годам
+        """
         result = {}
         for year, sal in self.salary.items():
             result[year] = int(sum(sal) / len(sal))
         return result
 
     def get_stat2(self):
+        """Получить динамику количества вакансий по годам
+
+        :return dict: Динамика количества вакансий по годам
+        """
         return self.vacancies_number
 
     def get_stat3(self):
+        """Получить динамику уровня зарплат по годам для выбранной профессии
+
+        :return dict: Динамика уровня зарплат по годам для выбранной профессии
+        """
         if not self.salary_of_vacancy_name:
             self.salary_of_vacancy_name = self.salary.copy()
             self.salary_of_vacancy_name = dict([(key, []) for key, value in self.salary_of_vacancy_name.items()])
@@ -96,6 +161,10 @@ class Statistic:
         return result
 
     def get_stat4(self):
+        """Получить динамику количества вакансий по годам для выбранной профессии
+
+        :return dict: Динамика количества вакансий по годам для выбранной профессии
+        """
         if not self.vac_count_of_vacancy_name:
             self.vac_count_of_vacancy_name = self.vacancies_number.copy()
             self.vac_count_of_vacancy_name = dict(
@@ -103,6 +172,10 @@ class Statistic:
         return self.vac_count_of_vacancy_name
 
     def get_stat5and6(self):
+        """Получить уровень и долю зарплат по городам (в порядке убывания)
+
+        :return: Уровень и доля зарплат по городам (в порядке убывания)
+        """
         result1 = {}
         for city, count in self.vac_city_number.items():
             result1[city] = round(count / self.count_of_vacancies, 4)
@@ -120,6 +193,7 @@ class Statistic:
         return dict(result2[:10]), dict(result1[:10])
 
     def print_statistics(self):
+        """Вывести статистику в консоль"""
         print('Динамика уровня зарплат по годам: ' + str(self.get_stat1()))
         print('Динамика количества вакансий по годам: ' + str(self.get_stat2()))
         print('Динамика уровня зарплат по годам для выбранной профессии: ' + str(self.get_stat3()))
@@ -130,11 +204,22 @@ class Statistic:
 
 
 class DataSet:
+    """Дата-сет для работы с таблицей
+    Attributes:
+        file_name (str): Название файла
+        vacancy_name (str): Название необходимой вакансии
+    """
     def __init__(self, file_name, vacancy_name):
+        """Конструктор класса DataSet
+
+        :param str file_name: Название файла
+        :param str vacancy_name: Название необходимой вакансии
+        """
         self.file_name = file_name
         self.vacancy_name = vacancy_name
 
     def csv_reader(self):
+        """Читает CSV файл"""
         with open(self.file_name, mode='r', encoding='utf-8-sig') as file:
             reader = csv.reader(file)
             header = next(reader)
@@ -144,6 +229,10 @@ class DataSet:
                     yield dict(zip(header, row))
 
     def get_statistic(self):
+        """Получить статистические данные
+
+        :return Statistics: Статистика
+        """
         statistics = Statistic()
 
         for vacancy_dictionary in self.csv_reader():
@@ -154,7 +243,16 @@ class DataSet:
 
 
 class InputConnect:
+    """Начальная точка программы. Объединяет всю логику программы
+
+    Attributes:
+        file_name (str): Название файла
+        vacancy_name (list): Название необходимой вакансии
+    """
     def __init__(self):
+        """
+        Начало работы программы
+        """
         self.file_name = input('Введите название файла: ')
         self.vacancy_name = input('Введите название профессии: ')
 
@@ -172,7 +270,30 @@ class InputConnect:
 
 
 class Report:
+    """Класс для построения статистических графиков
+
+    Attributes:
+        wb (Workbook): Вспомогательная переменная для openpyxl
+        vacancy_name (str): Название вакансии
+        img_filename (str): Название файла для выходного изображения статистики
+        stats1 (dict): Динамика уровня зарплат по годам
+        stats2 (dict): Динамика количества вакансий по годам
+        stats3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+        stats4 (dict): Динамика количества вакансий по годам для выбранной профессии
+        stats5 (dict): Уровень зарплат по городам (в порядке убывания)
+        stats6 (dict): Доля зарплат по городам (в порядке убывания)
+    """
     def __init__(self, vacancy_name, stats1, stats2, stats3, stats4, stats5, stats6):
+        """Конструктор класса для построения репортов
+
+        :param str vacancy_name: Название вакансии
+        :param dict stats1: Динамика уровня зарплат по годам
+        :param dict stats2: Динамика количества вакансий по годам
+        :param dict stats3: Динамика уровня зарплат по годам для выбранной профессии
+        :param dict stats4: Динамика количества вакансий по годам для выбранной профессии
+        :param dict stats5: Уровень зарплат по городам (в порядке убывания)
+        :param dict stats6: Доля зарплат по городам (в порядке убывания)
+        """
         self.wb = openpyxl.Workbook()
         self.vacancy_name = vacancy_name
         self.img_filename = ''
@@ -184,6 +305,10 @@ class Report:
         self.stats6 = stats6
 
     def generate_excel(self, filename):
+        """Генерирует Excel таблицу
+
+        :param str filename: Название выходного файла
+        """
         # Лист "Статистика по годам"
         ws1 = self.wb.active
         ws1.title = 'Статистика по годам'
@@ -243,6 +368,10 @@ class Report:
         self.wb.save(filename)
 
     def generate_img(self, filename):
+        """Генерирует диаграмму со статистикой
+
+        :param str filename: Название выходного файла
+        """
         self.img_filename = filename
 
         fig, ((ax1, ax2), (ax3, ax4)) = pyplot.subplots(nrows=2, ncols=2)
@@ -287,6 +416,10 @@ class Report:
         pyplot.savefig(filename)
 
     def generate_pdf(self, filename):
+        """Генерирует PDF файл со статистикой
+
+        :param str filename: Название выходного файла
+        """
         template = jinja2.Environment(loader=jinja2.FileSystemLoader('')).get_template("pdf_template.html")
 
         by_year_table = []
