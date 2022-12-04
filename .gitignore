@@ -1,6 +1,10 @@
 /.idea
 /venv
 /vacancies.csv
+/v_full.csv
 /__pycache__
 /elearn_2_1_1.py
 /elearn_2_1_2.py
+/graph.png
+/report.pdf
+/report.xlsx

@@ -64,7 +64,10 @@ class Vacancy:
         self.salary_currency = vacancy['salary_currency']
         self.salary_average = self.currency_to_rub[self.salary_currency] * (self.salary_from + self.salary_to) / 2
         self.area_name = vacancy['area_name']
-        self.year = int(datetime.strptime(vacancy['published_at'], '%Y-%m-%dT%H:%M:%S%z').year)
+        # Ранняя имплементация
+        # self.year = int(datetime.strptime(vacancy['published_at'], '%Y-%m-%dT%H:%M:%S%z').year)
+        # Новая
+        self.year = int(vacancy['published_at'][:4])
 
 
 class Statistic:
