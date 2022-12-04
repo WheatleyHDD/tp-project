@@ -42,6 +42,17 @@ class Salary:
         """Иницилизирует объект зарплаты
 
         :param dict vac: Словарь вакансии
+
+        >>> type(Salary({'salary_from': 10, 'salary_to': 20, 'salary_gross': 'True', 'salary_currency': 'RUR'})).__name__
+        'Salary'
+        >>> Salary({'salary_from': 10, 'salary_to': 20, 'salary_gross': 'True', 'salary_currency': 'RUR'}).salary_from
+        10
+        >>> Salary({'salary_from': 10, 'salary_to': 20, 'salary_gross': 'True', 'salary_currency': 'RUR'}).salary_to
+        20
+        >>> Salary({'salary_from': 10, 'salary_to': 20, 'salary_gross': 'True', 'salary_currency': 'RUR'}).salary_currency
+        'RUR'
+        >>> Salary({'salary_from': 10, 'salary_to': 20, 'salary_gross': 'True', 'salary_currency': 'USD'}).salary_avg
+        909.9
         """
         self.salary_from = int(float(vac['salary_from']))
         self.salary_to = int(float(vac['salary_to']))
@@ -54,6 +65,9 @@ class Salary:
         """Получить текстовое представление объекта зарплаты
 
         :return: Текстовое представление объекта зарплаты
+
+        >>> str(Salary({'salary_from': 10, 'salary_to': 20, 'salary_gross': 'True', 'salary_currency': 'USD'}))
+        '10 - 20 (Доллары) (Без вычета налогов)'
         """
         return '{0:,} - {1:,} ({2}) ({3})'.format(self.salary_from,
                                                   self.salary_to,
@@ -100,7 +114,28 @@ class Vacancy:
         """Конструктор объекта вакансий
 
         :param dict vacancy: Словарь вакансии
+
+        >>> Vacancy({'test_data': True}).experience_id
+        'Нет опыта'
+        >>> Vacancy({'test_data': True}).premium
+        'Да'
         """
+        if 'test_data' in vacancy.keys():
+            vacancy = {
+                'name': 'Test',
+                'description': 'Test',
+                'key_skills': 'Test',
+                'experience_id': 'noExperience',
+                'premium': 'True',
+                'employer_name': 'Test',
+                'salary_from': 10,
+                'salary_to': 20,
+                'salary_gross': 'True',
+                'salary_currency': 'RUR',
+                'area_name': 'Test',
+                'published_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%S')+'+0300',
+            }
+
         self.index = 0
 
         self.name = Cleaners.html_remove(vacancy['name'])
@@ -260,6 +295,9 @@ class Cleaners:
 
         :param str text: Исходный текст
         :return str: Почищенная текст
+
+        >>> Cleaners.html_remove("<b>Test</b>",)
+        'Test'
         """
         text = re.sub('<.*?>', '', text)
         text = re.sub(r'\s+', ' ', text)
@@ -272,6 +310,9 @@ class Cleaners:
         :param str text: Исходный текст
         :param int count: Количество оставшихся символов
         :return str: Укороченная строка
+
+        >>> Cleaners.short_text("Testing", 4)
+        'Test...'
         """
         return text if len(text) <= count else text[:count] + "..."
 

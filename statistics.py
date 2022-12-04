@@ -33,7 +33,31 @@ class Vacancy:
         """Конструктор объекта вакансий
 
         :param dict vacancy: Словарь вакансии
+
+        >>> Vacancy({'test_data': True}).salary_average
+        909.9
+        >>> type(Vacancy({'test_data': True})).__name__
+        'Vacancy'
+        >>> Vacancy({'test_data': True}).year
+        2007
+
         """
+        if 'test_data' in vacancy.keys():
+            vacancy = {
+                'name': 'Test',
+                'description': 'Test',
+                'key_skills': 'Test',
+                'experience_id': 'noExperience',
+                'premium': 'True',
+                'employer_name': 'Test',
+                'salary_from': 10,
+                'salary_to': 20,
+                'salary_gross': 'True',
+                'salary_currency': 'USD',
+                'area_name': 'Test',
+                'published_at': '2007-12-03T17:34:36+0300',
+            }
+
         self.name = vacancy['name']
         self.salary_from = int(float(vacancy['salary_from']))
         self.salary_to = int(float(vacancy['salary_to']))
