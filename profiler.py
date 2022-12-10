@@ -9,8 +9,8 @@ if __name__ == '__main__':
     pr = cProfile.Profile()
     pr.enable()
 
-    # mp_stats.InputConnect("chunks", "Аналитик")
-    statistics.InputConnect("vacancies.csv", "Аналитик")
+    mp_stats.InputConnect("chunks", "Аналитик")
+    # statistics.InputConnect("vacancies.csv", "Аналитик")
 
     pr.disable()
     pr.print_stats(sort="tottime")

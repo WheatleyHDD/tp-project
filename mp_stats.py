@@ -104,6 +104,7 @@ class StatsContainer:
         """
         vac_sal = {}
         for o in self.stats: vac_sal.update(o.salary_of_vacancy_name)
+        if not vac_sal: vac_sal = dict([(key, []) for key, value in self.salary_dict.items()])
         result = {}
         for year, sal in vac_sal.items():
             if len(sal) == 0:
@@ -119,6 +120,7 @@ class StatsContainer:
         """
         vac_count_sal = {}
         for o in self.stats: vac_count_sal.update(o.vac_count_of_vacancy_name)
+        if not vac_count_sal: vac_count_sal = dict( [(key, 0) for key, value in self.vacancies_number.items()])
         return vac_count_sal
 
     def print_statistics(self):
@@ -184,15 +186,6 @@ class Statistic:
             else:
                 self.vac_count_of_vacancy_name[vacancy.year] += 1
 
-        if not self.salary_of_vacancy_name:
-            self.salary_of_vacancy_name = self.salary.copy()
-            self.salary_of_vacancy_name = dict([(key, []) for key, value in self.salary_of_vacancy_name.items()])
-
-        if not self.vac_count_of_vacancy_name:
-            self.vac_count_of_vacancy_name = self.vacancies_number.copy()
-            self.vac_count_of_vacancy_name = dict(
-                [(key, 0) for key, value in self.vac_count_of_vacancy_name.items()])
-
     def write(self, vacancy, vacancy_name):
         """Заполение статистики
 
@@ -203,66 +196,6 @@ class Statistic:
         self.year_vac_dynamics(vacancy)
         self.curr_vac_dynamics(vacancy, vacancy_name)
         self.count_of_vacancies += 1
-
-
-class CityStats:
-    def __init__(self):
-        self.salary_city = {}
-        self.vac_city_number = {}
-        self.count_of_vacancies = 0
-
-        self.result1 = {}
-        self.result2 = {}
-
-    def city_sal_dynamics(self, vacancy):
-        """Составление динамики зарплаты по городам
-
-        :param Vacancy vacancy: Вакансия
-        """
-        if vacancy.area_name not in self.salary_city:
-            self.salary_city[vacancy.area_name] = [vacancy.salary_average]
-        else:
-            self.salary_city[vacancy.area_name].append(vacancy.salary_average)
-
-    def city_count_dynamics(self, vacancy):
-        """Составление динамики количества вакансий по городам
-
-        :param Vacancy vacancy: Вакансия
-        """
-        if vacancy.area_name not in self.vac_city_number:
-            self.vac_city_number[vacancy.area_name] = 1
-        else:
-            self.vac_city_number[vacancy.area_name] += 1
-
-    def write(self, vacancy):
-        self.city_sal_dynamics(vacancy)
-        self.city_count_dynamics(vacancy)
-        self.count_of_vacancies += 1
-
-    def get_stat5and6(self):
-        """Получить уровень и долю зарплат по городам (в порядке убывания)
-
-        :return: Уровень и доля зарплат по городам (в порядке убывания)
-        """
-        self.result1 = {}
-        for city, count in self.vac_city_number.items():
-            self.result1[city] = round(count / self.count_of_vacancies, 4)
-        result1 = list(filter(lambda a: a[-1] >= 0.01,
-                              [(key, value) for key, value in self.result1.items()]))
-        result1.sort(key=lambda a: a[-1], reverse=True)
-
-        self.result2 = {}
-        for city, sal in self.salary_city.items():
-            self.result2[city] = int(sum(sal) / len(sal))
-        result2 = list(filter(lambda a: a[0] in list(dict(result1).keys()),
-                              [(key, value) for key, value in self.result2.items()]))
-        result2.sort(key=lambda a: a[-1], reverse=True)
-
-        return dict(result2[:10]), dict(result1[:10])
-
-    def print_statistic(self):
-        print('Уровень зарплат по городам (в порядке убывания): ' + str(self.result2))
-        print('Доля вакансий по городам (в порядке убывания): ' + str(self.result1))
 
 
 class DataSet:
@@ -290,7 +223,7 @@ class DataSet:
             header_length = len(header)
             for row in reader:
                 if '' not in row and len(row) == header_length:
-                    self.data.append(Vacancy(dict(zip(header, row))))
+                    yield dict(zip(header, row))
 
     def get_statistic(self):
         """Получить статистические данные
@@ -299,14 +232,10 @@ class DataSet:
         """
         statistics = Statistic()
 
-        for vacancy in self.data:
-            statistics.write(vacancy, self.vacancy_name)
+        for vacancy in self.csv_reader():
+            statistics.write(Vacancy(vacancy), self.vacancy_name)
 
         return statistics
-
-
-class CustomManager(BaseManager):
-    pass
 
 
 class InputConnect:
@@ -328,29 +257,28 @@ class InputConnect:
         if vn is None:
             self.vacancy_name = input('Введите название профессии: ')
 
-        container = StatsContainer()
-        with multiprocessing.Manager() as mngr:
-            statistic_list = mngr.list()
+        files = [self.file_name + "/" + f for f in os.listdir(self.file_name)]
 
-            files = [self.file_name + "/" + f for f in os.listdir(self.file_name)]
-            pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-            [pool.apply(self.generate_statistic, args=(f, statistic_list)) for f in files]
+        self.container = StatsContainer()
+        pool = multiprocessing.Pool(multiprocessing.cpu_count())
+        pool.map_async(self.generate_statistic, files, callback=self.on_end_pool)
+        pool.close()
+        pool.join()
 
-            container.write(statistic_list)
+        # report = Report(self.vacancy_name, self.container.get_stat1(), self.container.get_stat2(),
+        #                 self.container.get_stat3(), self.container.get_stat4(), {}, {})
+        #
+        # report.generate_excel('report.xlsx')
+        # report.generate_img('graph.png')
+        # report.generate_pdf('report.pdf')
 
-            container.print_statistics()
-
-            report = Report(self.vacancy_name, container.get_stat1(), container.get_stat2(), container.get_stat3(),
-                            container.get_stat4(), {}, {})
-
-            report.generate_excel('report.xlsx')
-            report.generate_img('graph.png')
-            report.generate_pdf('report.pdf')
-
-    def generate_statistic(self, queue, statistic_list):
+    def generate_statistic(self, queue):
         dataset = DataSet(queue, self.vacancy_name)
-        dataset.csv_reader()
-        statistic_list.append(dataset.get_statistic())
+        return dataset.get_statistic()
+
+    def on_end_pool(self, response):
+        self.container.write(response)
+        self.container.print_statistics()
 
 
 class Report:
