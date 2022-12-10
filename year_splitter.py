@@ -90,6 +90,7 @@ class DataSet:
                     self.data[v_year].append(dict(zip(self.header, row)))
 
     def export_csv(self, directory):
+        """Экпорт данных по файлам"""
         os.makedirs(directory, exist_ok=True)
         for year in self.data.keys():
             filename = directory + "/" + str(year) + ".csv"

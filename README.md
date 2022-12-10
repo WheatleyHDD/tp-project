@@ -3,9 +3,11 @@
 ![](https://i.imgur.com/KMuOQgx.png)
 ## Профайлинг
 ### Вывод вакансий
-![img.png](img.png)
+![img.png](images/img_0.png)
 ### Статистика
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 После переписывания
 
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
+## Разбитие по годам
+![img](images/img.png)
