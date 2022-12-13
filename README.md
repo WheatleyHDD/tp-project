@@ -17,3 +17,5 @@
 ![](images/img_3.png)
 multiproccessing
 ![](images/img_4.png)
+concurrent.futures
+![](images/img_5.png)
