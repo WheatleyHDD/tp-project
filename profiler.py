@@ -10,7 +10,7 @@ if __name__ == '__main__':
     pr.enable()
 
     mp_stats.InputConnect("chunks", "Аналитик")
-    # statistics.InputConnect("vacancies.csv", "Аналитик")
+    #statistics.InputConnect("vacancies.csv", "Аналитик")
 
     pr.disable()
     pr.print_stats(sort="tottime")

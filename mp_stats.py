@@ -1,7 +1,6 @@
 import csv
 import os
 import multiprocessing
-from multiprocessing.managers import BaseManager
 
 import openpyxl
 import openpyxl.utils
@@ -272,11 +271,21 @@ class InputConnect:
         # report.generate_img('graph.png')
         # report.generate_pdf('report.pdf')
 
-    def generate_statistic(self, queue):
-        dataset = DataSet(queue, self.vacancy_name)
+    def generate_statistic(self, filename):
+        """Таск для многопотока
+
+        :param filename: Название файла
+        :return: Статистика одного года
+        """
+        dataset = DataSet(filename, self.vacancy_name)
         return dataset.get_statistic()
 
     def on_end_pool(self, response):
+        """Коллбэк по окончанию работы
+
+        :param response: ответ
+        :return:
+        """
         self.container.write(response)
         self.container.print_statistics()
 

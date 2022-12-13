@@ -11,3 +11,9 @@
 ![img_2.png](images/img_2.png)
 ## Разбитие по годам
 ![img](images/img.png)
+
+## Мультипроцессинг
+Без мультипроцессинга
+![](images/img_3.png)
+multiproccessing
+![](images/img_4.png)
