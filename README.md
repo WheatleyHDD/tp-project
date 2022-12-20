@@ -26,3 +26,6 @@ concurrent.futures
 
 ## Конвертация валют
 ![](images/img_8.png)
+
+## Новые вакансии
+![](images/img_9.png)
