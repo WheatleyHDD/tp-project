@@ -23,37 +23,8 @@ class Vacancy:
         """Конструктор объекта вакансий
 
         :param dict vacancy: Словарь вакансии
-
-        >>> Vacancy({'test_data': True}).salary_average
-        909.9
-        >>> type(Vacancy({'test_data': True})).__name__
-        'Vacancy'
-        >>> Vacancy({'test_data': True}).year
-        2007
-
         """
-        if 'test_data' in vacancy.keys():
-            vacancy = {
-                'name': 'Test',
-                'description': 'Test',
-                'key_skills': 'Test',
-                'experience_id': 'noExperience',
-                'premium': 'True',
-                'employer_name': 'Test',
-                'salary_from': 10,
-                'salary_to': 20,
-                'salary_gross': 'True',
-                'salary_currency': 'USD',
-                'area_name': 'Test',
-                'published_at': '2007-12-03T17:34:36+0300',
-            }
-
         self.name = vacancy['name']
-        self.salary_from = int(float(vacancy['salary_from']))
-        self.salary_to = int(float(vacancy['salary_to']))
-        self.salary_currency = vacancy['salary_currency']
-        self.salary_average = self.currency_to_rub[self.salary_currency] * (self.salary_from + self.salary_to) / 2
-        self.area_name = vacancy['area_name']
         # Ранняя имплементация
         # self.year = int(datetime.strptime(vacancy['published_at'], '%Y-%m-%dT%H:%M:%S%z').year)
         # Новая
@@ -81,13 +52,13 @@ class DataSet:
         with open(self.file_name, mode='r', encoding='utf-8-sig') as file:
             reader = csv.reader(file)
             self.header = next(reader)
-            header_length = len(self.header)
+            # header_length = len(self.header)
             for row in reader:
-                if '' not in row and len(row) == header_length:
-                    v_year = str(Vacancy(dict(zip(self.header, row))).year)
-                    if v_year not in self.data.keys():
-                        self.data[v_year] = []
-                    self.data[v_year].append(dict(zip(self.header, row)))
+                # if '' not in row and len(row) == header_length:
+                v_year = str(Vacancy(dict(zip(self.header, row))).year)
+                if v_year not in self.data.keys():
+                    self.data[v_year] = []
+                self.data[v_year].append(dict(zip(self.header, row)))
 
     def export_csv(self, directory):
         """Экпорт данных по файлам"""
@@ -105,17 +76,17 @@ class InputConnect:
 
     Attributes:
         file_name (str): Название файла
-        vacancy_name (list): Название необходимой вакансии
     """
     def __init__(self):
         """
         Начало работы программы
         """
         self.file_name = input('Введите название файла: ')
+        self.dir_name = input('Введите название выходной папки: ')
 
         dataset = DataSet(self.file_name)
         dataset.csv_reader()
-        dataset.export_csv("chunks")
+        dataset.export_csv(self.dir_name)
 
 
 if __name__ == '__main__': InputConnect()

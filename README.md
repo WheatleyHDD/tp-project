@@ -19,3 +19,7 @@ multiproccessing
 ![](images/img_4.png)
 concurrent.futures
 ![](images/img_5.png)
+
+## Курсы валют
+![](images/img_6.png)
+![](images/img_7.png)
