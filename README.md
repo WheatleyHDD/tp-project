@@ -23,3 +23,6 @@ concurrent.futures
 ## Курсы валют
 ![](images/img_6.png)
 ![](images/img_7.png)
+
+## Конвертация валют
+![](images/img_8.png)
