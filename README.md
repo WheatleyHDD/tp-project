@@ -33,3 +33,7 @@ concurrent.futures
 Итоговый файл new_vacancies.csv
 Решение в hhru_parser.py
 ![](images/img_9.png)
+
+## Актуальные зарплаты
+Решение в pandas_analytics.py
+![](images/img_8.png)
